@@ -1,4 +1,6 @@
 \documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{natbib}
 
 \begin{document}
 
@@ -15,5 +17,79 @@ Obviously, I expect it to be too late, so just say so. It is kind of fun playing
 
 Finally, I may have part of an explanation why Q3 may be more powerful than Gamma in small and moderate samples. The Q3 measure the association conditionally given scores from 0 to 27, whereas Gamma measure association conditionally given rest scores from 0-24. Gamma therefore excludes more persons with extreme scores than Q3. Whether that is the only reason, I have no idea. But it has to mean something with short scales and small samples.  In my simulated phq6000  data, Q3 disclosed spurious evidence of local dependence. That was expected because of the sample size, but Gamma could not see it.
 
+\section{Methods for Detecting Local Dependence}
+
+This section summarizes the methodology for detecting local dependence (LD) in Rasch models
+that is reviewed in \citet{johansson2026a}.
+
+\paragraph{Residual correlations: Yen's $Q_3$.}
+The most widely reported index of LD is Yen's $Q_3$ \citep{yen1984}, the Pearson correlation
+between the standardized residuals of a pair of items after fitting the Rasch model. It is
+produced automatically by the residual correlation matrices of most Rasch software
+\citep[e.g.,][]{linacre2024,andrich2010,chalmers2012,robitzsch2024tam}, but its null distribution
+is negatively centered rather than zero and depends on the number of items, the sample size, and
+the number of response categories \citep{christensen2017}, so a single fixed critical value
+(commonly between .1 and .7 in applied work) cannot be correct in general.
+
+\paragraph{Partial gamma.}
+For polytomous items, the analogue of the dichotomous Mantel--Haenszel test of conditional
+independence is the partial gamma coefficient \citep{davis1967}, a pooled summary of the
+Goodman--Kruskal gamma coefficients \citep{goodmankruskal1954} computed within each level of the
+restscore formed by removing one item of the pair. Conditioning on a restscore that excludes one
+item removes the part-whole bias that afflicts $Q_3$ \citep{rosenbaum1984}, and under uniform
+(response-dependence-type) local dependence in the log-linear Rasch model
+\citep{kelderman1984}, partial gamma consistently estimates the dependence parameter for
+dichotomous items \citep{kreinerchristensen2004}. It is implemented in the \texttt{iarm}
+\citep{muellersantiago2022} and \texttt{easyRasch2} \citep{johansson2026b} R packages and in the
+DIGRAM software \citep{kreinernielsen2023}, and is ordinarily referred to its asymptotic standard
+error \citep{goodmankruskal1954}, a reference that is suspected but not established to perform
+poorly at the sample sizes and pooled tables met in practice \citep{vanderark2015,kreiner1987}.
+
+\paragraph{Parametric bootstrap critical values.}
+\citet{christensen2017} proposed simulating data from the Rasch model fitted to the observed
+data, recomputing the residual correlation matrix for each simulated dataset, and using an
+empirical percentile of the resulting distribution as a data-dependent critical value. Two
+statistics were considered: the maximum residual correlation $Q_{3,max}$, and the maximum relative
+to the average observed correlation, $Q_{3,*} = Q_{3,max} - \bar{Q}_3$ \citep{marais2013}, which is
+more stable across scale lengths.
+
+\paragraph{Rival indices and alternative tests.}
+$Q_3$ has been compared against competing statistics repeatedly. \citet{kim2011} compared ten
+indices of conditional dependence and found $Q_3$ among the best compromises of power and false
+positives. \citet{houtsedwards2013} recommended a jackknife slope index together with a
+likelihood ratio statistic for polytomous items in samples of a few hundred; \citet{edwards2018}
+developed the jackknife index further but declined to attach a critical value to it.
+\citet{finchjeffers2016} proposed a permutation test that randomly reorders the residuals of one
+item in a pair. \citet{debelakkoller2020} proposed two nonparametric tests based on $Q_3$ that
+require no estimated parameters, building on the marginal-sum-preserving resampling of
+\citet{ponocny2001}; this resampling approach is established only for dichotomous items. Pairwise
+likelihood ratio and Pearson statistics \citep{chenthissen1997} and a jackknife slope index
+\citep{edwards2018} are further alternatives not reported by mainstream Rasch software.
+
+\paragraph{Multiplicity correction across the item matrix.}
+Every one of the statistics above is ordinarily evaluated per pair, but a scale with $k$ items
+yields $k(k-1)/2$ pairs, so testing each at a fixed level makes a false flag somewhere in the
+matrix nearly certain. \citet{debelakkoller2020} advise nominating only a few pairs in advance
+rather than correcting across the whole matrix, reasoning that a Bonferroni-type correction
+would drastically reduce power; this need not hold for every correction \citep{ferreira2024}. A
+Westfall--Young step-down procedure \citep{westfallyoung1993}, which standardizes each pairwise
+statistic against its own simulated null distribution and steps down using the joint bootstrap
+distribution of the maximum, controls the familywise error rate and can be more powerful than
+Bonferroni or Holm corrections when the pairwise statistics are dependent, as pairs sharing an
+item necessarily are. The Benjamini--Hochberg false discovery rate procedure
+\citep{benjaminihochberg1995} is a further alternative, though it scales poorly with the number
+of pairwise comparisons in this setting.
+
+\paragraph{Interpretation.}
+A positive conditional association under the Rasch model indicates response or trait dependence,
+while a negative one indicates multidimensionality; the two mechanisms have opposite effects on
+the unit of the scale and on reliability \citep{maraisandrich2008}. A single dependent pair can
+also produce significant association for every other pair sharing an item with it while leaving
+unrelated pairs unaffected \citep{kreinerchristensen2011}, so a rejected hypothesis is evidence
+against the fitted model as a whole rather than against the one pair named in it
+\citep{kreiner1987}.
+
+\bibliographystyle{apalike}
+\bibliography{references}
 
 \end{document}
