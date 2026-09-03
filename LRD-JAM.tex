@@ -89,6 +89,47 @@ unrelated pairs unaffected \citep{kreinerchristensen2011}, so a rejected hypothe
 against the fitted model as a whole rather than against the one pair named in it
 \citep{kreiner1987}.
 
+\section{R Availability of Alternative Detection Methods}
+
+None of the three alternatives to $Q_3$ and partial gamma discussed above --- the jackknife slope
+index, the permutation test of \citet{finchjeffers2016}, and the quasi-exact tests of
+\citet{debelakkoller2020} --- has a dedicated CRAN package.
+
+\paragraph{Jackknife slope index.}
+The jackknife slope index \citep{houtsedwards2013,edwards2018} has no public R implementation.
+This is consistent with the manuscript's own reason for excluding it from the comparison: it is
+not reported by the software Rasch analyses are actually run in, although it could in principle
+be computed for a Rasch model. Applying it would require implementing the index from scratch.
+
+\paragraph{Permutation test.}
+The $Q_3$-based permutation test of \citet{finchjeffers2016}, which randomly reorders the
+residuals of one item in a pair and compares the observed $Q_3$ to the resulting null
+distribution, likewise has no existing R package or public code. It is straightforward to
+implement directly, since it requires only a residual correlation matrix and a permutation loop,
+but no ready-made implementation could be located.
+
+\paragraph{Quasi-exact nonparametric tests.}
+\citet{debelakkoller2020} build on the counting statistics of \citet{ponocny2001}, and no package
+implements their quasi-exact test specifically. A closely related implementation is available,
+however: the \texttt{NPtest} function of the \texttt{eRm} package \citep{mairhatzinger2007}
+provides the broader family of nonparametric Rasch model tests developed by \citet{ponocny2001}
+and \citet{kollerhatzinger2013} (statistics $T_1$, $T_4$, $T_7$, $T_{10}$, $T_{11}$, and others),
+using binary matrices with fixed marginal sums sampled by the \texttt{RaschSampler} package
+\citep{verhelst2007}. This is the same resampling principle that \citet{debelakkoller2020} extend,
+but \texttt{NPtest} is restricted to dichotomous items, matching the scope limitation already
+noted in the introduction: the counting statistics of \citet{ponocny2001} and the resampling
+tests built on them are defined for dichotomous responses only, and so do not extend to the
+polytomous design used here.
+
+\paragraph{Summary.}
+This confirms the boundary drawn in the introduction. Of the methods surveyed, only $Q_3$
+\citep{yen1984} and partial gamma \citep{davis1967} have actively maintained R implementations
+that also support polytomous items, in \texttt{iarm} \citep{muellersantiago2022} and
+\texttt{easyRasch2} \citep{johansson2026b}. The jackknife slope index and the permutation test of
+\citet{finchjeffers2016} are unimplemented in R altogether, while the nonparametric resampling
+tests related to \citet{debelakkoller2020} are implemented only for dichotomous items via
+\texttt{eRm::NPtest}.
+
 \bibliographystyle{apalike}
 \bibliography{references}
 
